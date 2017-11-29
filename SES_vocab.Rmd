@@ -37,16 +37,10 @@ library(metafor)
 ```
 
 ```{r combine-res, include=FALSE, echo=FALSE}
-comp <- read.table("comp.txt",sep="\t",header=T)
-comp=comp[,c("infant_group"  ,  "mean_age_1_days" ,"r"    ,  "n_1", "Location")]
+comp <- read.table("comp.txt",sep="\t",header=T,  dec = ",")
 comp$type="comp"
-
-prod <- read.table("prod.txt",sep="\t",header=T)
-prod=prod[,c("infant_group"  ,  "mean_age_1_days" ,"r"    ,  "n_1", "Location")]
-prod$type="prod"
-
-all=rbind(comp,prod)
-names(all)<-c("id","age","r","n","loc","type")
+all=comp
+names(all)<-c("id","age","z","n","r", "loc", "lang_measure", "lang_cat", "SES_measure", "SES_cat", "SES_priority", "type_of_measure","type")
 
 all$locgen=ifelse(all$loc=="United States","US","other")
 
@@ -70,44 +64,52 @@ regtest(rma.all)
 pdf("~/Desktop/funnel.pdf",height=5,width=5)
 funnel(rma.all)
 points(all$se~all$z,pch=20,col="white")
-points(all$se~all$z,subset=c(all$type=="prod"),pch=20,col="red")
-points(all$se~all$z,subset=c(all$id=="notre_CCT"),pch=3,cex=2)
-points(all$se~all$z,subset=c(all$id=="notre_CDI_production"),pch=3,cex=2)
+read.table("final.txt",header=T)->all
+
+rma.all=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id) 
+rma.all
+
+forest(rma.all)
+regtest(rma.all)
+
+pdf("~/Desktop/funnel.pdf",height=5,width=5)
+funnel(rma.all)
+points(all$se~all$z,pch=20,col="white")
+# points(all$se~all$z,subset=c(all$type=="prod"),pch=20,col="red")
+# points(all$se~all$z,subset=c(all$id=="notre_CCT"),pch=3,cex=2)
+# points(all$se~all$z,subset=c(all$id=="notre_CDI_production"),pch=3,cex=2)
 
 ```
+### all moderators
+##age
 ```{r moderators, include=FALSE}
-#all moderators
-rma.typeAge=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id, mods=~all$type*all$age.c) 
+rma.typeAge=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id, mods=~all$age.c) 
 rma.typeAge
-```
 
-```{r comp-prod, include=FALSE}
-### comp vs prod
-rma.type=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id, mods=~all$type) 
-rma.type
-```
-```{r comp, include=FALSE}
-### comprehension
-
-rma.comp=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,subset=c(all$type=="comp")) 
-rma.comp
-```
-```{r prod, include=FALSE}
-
-### production
-
-rma.prod=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,subset=c(all$type=="prod")) 
-rma.prod
-```
-
-```{r loc, include=FALSE}
 ### location
-
 rma.loc=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,mods=~all$locgen) 
 rma.loc
-```
 
-```{r age,include=FALSE}
+### language cat
+
+rma.lang_cat=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,mods=~all$lang_cat+all$age.c) 
+rma.lang_cat
+
+### SES cat
+
+rma.SES_cat=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,mods=~all$SES_cat) 
+rma.SES_cat
+
+### SES priority #what the goal of the study to detect difference as a function of SES?
+
+rma.SES_priority=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,mods=~all$SES_priority) 
+rma.SES_priority
+
+### type of measure #if it was a direct measure in the child or not
+
+rma.type_of_measure=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,mods=~all$type_of_measure) 
+rma.type_of_measure
+
 ### age
 
 pdf("~/Desktop/age.pdf")
@@ -117,7 +119,6 @@ dev.off()
 
 
 ```
-
 <!-- *Constraints: -->
 <!-- Double-spacing throughout (abstract, body text, references) -->
 <!-- Using 12-point, Times New Roman font -->

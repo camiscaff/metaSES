@@ -125,14 +125,8 @@ $(document).ready(function () {
 <div id="put-table-together" class="section level3">
 <h3>put table together</h3>
 <pre class="r"><code>comp &lt;- read.table(&quot;comp.txt&quot;,sep=&quot;\t&quot;,header=T,  dec = &quot;,&quot;)
-# comp=comp[,c(&quot;infant_group&quot;,&quot;mean_age_1_days&quot; ,&quot;z&quot;, &quot;n_1&quot;,&quot;r&quot;, &quot;Location&quot;, &quot;lang_measure&quot;, &quot;language_cat&quot;, &quot;SES_measure&quot;,&quot;SES_cat&quot;, &quot;SES_as_primary&quot;, &quot;type_of_measure&quot; )]
 comp$type=&quot;comp&quot;
-
-# prod &lt;- read.table(&quot;prod.txt&quot;,sep=&quot;\t&quot;,header=T)
-# prod=prod[,c(&quot;infant_group&quot;  ,  &quot;mean_age_1_days&quot; ,&quot;r&quot;    ,  &quot;n_1&quot;, &quot;Location&quot;)]
-# prod$type=&quot;prod&quot;
 all=comp
-#all=rbind(comp,prod)
 names(all)&lt;-c(&quot;id&quot;,&quot;age&quot;,&quot;z&quot;,&quot;n&quot;,&quot;r&quot;, &quot;loc&quot;, &quot;lang_measure&quot;, &quot;lang_cat&quot;, &quot;SES_measure&quot;, &quot;SES_cat&quot;, &quot;SES_priority&quot;, &quot;type_of_measure&quot;,&quot;type&quot;)
 
 all$locgen=ifelse(all$loc==&quot;United States&quot;,&quot;US&quot;,&quot;other&quot;)
@@ -187,6 +181,10 @@ points(all$se~all$z,pch=20,col=&quot;white&quot;)
 </div>
 <div id="all-moderators" class="section level3">
 <h3>all moderators</h3>
+</div>
+</div>
+<div id="age" class="section level2">
+<h2>age</h2>
 <pre class="r"><code>rma.typeAge=rma(ri=all$r,ni=all$n,measure=&quot;ZCOR&quot;,slab=all$id, mods=~all$age.c) 
 rma.typeAge</code></pre>
 <pre><code>## 
@@ -212,22 +210,6 @@ rma.typeAge</code></pre>
 ## 
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
-<!-- ### comp vs prod -->
-<!-- ```{r comp-prod} -->
-<!-- rma.type=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id, mods=~all$type)  -->
-<!-- rma.type -->
-<!-- ``` -->
-<!-- ### comprehension -->
-<!-- ```{r comp} -->
-<!-- rma.comp=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,subset=c(all$type=="comp"))  -->
-<!-- rma.comp -->
-<!-- ``` -->
-<!-- ### production -->
-<!-- ```{r prod} -->
-<!-- rma.prod=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,subset=c(all$type=="prod"))  -->
-<!-- rma.prod -->
-<!-- ``` -->
-</div>
 <div id="location" class="section level3">
 <h3>location</h3>
 <pre class="r"><code>rma.loc=rma(ri=all$r,ni=all$n,measure=&quot;ZCOR&quot;,slab=all$id,mods=~all$locgen) 
@@ -258,29 +240,30 @@ rma.loc</code></pre>
 </div>
 <div id="language-cat" class="section level3">
 <h3>language cat</h3>
-<pre class="r"><code>rma.lang_cat=rma(ri=all$r,ni=all$n,measure=&quot;ZCOR&quot;,slab=all$id,mods=~all$lang_cat) 
+<pre class="r"><code>rma.lang_cat=rma(ri=all$r,ni=all$n,measure=&quot;ZCOR&quot;,slab=all$id,mods=~all$lang_cat+all$age.c) 
 rma.lang_cat</code></pre>
 <pre><code>## 
 ## Mixed-Effects Model (k = 14; tau^2 estimator: REML)
 ## 
-## tau^2 (estimated amount of residual heterogeneity):     0.0305 (SE = 0.0195)
-## tau (square root of estimated tau^2 value):             0.1746
-## I^2 (residual heterogeneity / unaccounted variability): 71.93%
-## H^2 (unaccounted variability / sampling variability):   3.56
-## R^2 (amount of heterogeneity accounted for):            41.34%
+## tau^2 (estimated amount of residual heterogeneity):     0.0242 (SE = 0.0173)
+## tau (square root of estimated tau^2 value):             0.1556
+## I^2 (residual heterogeneity / unaccounted variability): 67.57%
+## H^2 (unaccounted variability / sampling variability):   3.08
+## R^2 (amount of heterogeneity accounted for):            53.42%
 ## 
 ## Test for Residual Heterogeneity: 
-## QE(df = 11) = 43.3806, p-val &lt; .0001
+## QE(df = 10) = 34.6880, p-val = 0.0001
 ## 
-## Test of Moderators (coefficient(s) 2:3): 
-## QM(df = 2) = 8.3097, p-val = 0.0157
+## Test of Moderators (coefficient(s) 2:4): 
+## QM(df = 3) = 12.6471, p-val = 0.0055
 ## 
 ## Model Results:
 ## 
 ##                   estimate      se    zval    pval    ci.lb   ci.ub   
-## intrcpt             0.0138  0.1507  0.0916  0.9270  -0.2815  0.3091   
-## all$lang_catCDI     0.1459  0.1898  0.7685  0.4422  -0.2261  0.5179   
-## all$lang_catPPVT    0.4187  0.1678  2.4957  0.0126   0.0899  0.7475  *
+## intrcpt             0.1217  0.1542  0.7891  0.4300  -0.1806  0.4240   
+## all$lang_catCDI     0.1564  0.1766  0.8854  0.3760  -0.1898  0.5026   
+## all$lang_catPPVT    0.1262  0.2341  0.5390  0.5899  -0.3327  0.5851   
+## all$age.c           0.0005  0.0003  1.6586  0.0972  -0.0001  0.0010  .
 ## 
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
@@ -318,8 +301,8 @@ rma.SES_cat</code></pre>
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
-<div id="ses-priority" class="section level3">
-<h3>SES priority</h3>
+<div id="ses-priority-what-the-goal-of-the-study-to-detect-difference-as-a-function-of-ses" class="section level3">
+<h3>SES priority #what the goal of the study to detect difference as a function of SES?</h3>
 <pre class="r"><code>rma.SES_priority=rma(ri=all$r,ni=all$n,measure=&quot;ZCOR&quot;,slab=all$id,mods=~all$SES_priority) 
 rma.SES_priority</code></pre>
 <pre><code>## 
@@ -349,8 +332,8 @@ rma.SES_priority</code></pre>
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
-<div id="type-of-measure" class="section level3">
-<h3>type of measure</h3>
+<div id="type-of-measure-if-it-was-a-direct-measure-in-the-child-or-not" class="section level3">
+<h3>type of measure #if it was a direct measure in the child or not</h3>
 <pre class="r"><code>rma.type_of_measure=rma(ri=all$r,ni=all$n,measure=&quot;ZCOR&quot;,slab=all$id,mods=~all$type_of_measure) 
 rma.type_of_measure</code></pre>
 <pre><code>## 
@@ -380,7 +363,7 @@ rma.type_of_measure</code></pre>
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
-<div id="age" class="section level3">
+<div id="age-1" class="section level3">
 <h3>age</h3>
 <pre class="r"><code>pdf(&quot;~/Desktop/age.pdf&quot;)
 plot(all$z~ all$age,cex=1+(all$n/max(all$n,na.rm=T)),col=ifelse(all$type==&quot;comp&quot;,&quot;red&quot;,&quot;black&quot;),xlab=&quot;Age (jours)&quot;,ylab=&quot;z&quot;,pch=20)

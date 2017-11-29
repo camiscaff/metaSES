@@ -1,8 +1,8 @@
 ---
 title: "final analyses"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -23,14 +23,8 @@ write.table(comp,"comp.txt",row.names=F,sep="\t")
 ### put table together
 ```{r combine-res}
 comp <- read.table("comp.txt",sep="\t",header=T,  dec = ",")
-# comp=comp[,c("infant_group","mean_age_1_days" ,"z", "n_1","r", "Location", "lang_measure", "language_cat", "SES_measure","SES_cat", "SES_as_primary", "type_of_measure" )]
 comp$type="comp"
-
-# prod <- read.table("prod.txt",sep="\t",header=T)
-# prod=prod[,c("infant_group"  ,  "mean_age_1_days" ,"r"    ,  "n_1", "Location")]
-# prod$type="prod"
 all=comp
-#all=rbind(comp,prod)
 names(all)<-c("id","age","z","n","r", "loc", "lang_measure", "lang_cat", "SES_measure", "SES_cat", "SES_priority", "type_of_measure","type")
 
 all$locgen=ifelse(all$loc=="United States","US","other")
@@ -63,26 +57,11 @@ points(all$se~all$z,pch=20,col="white")
 
 ```
 ### all moderators
+##age
 ```{r moderators}
 rma.typeAge=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id, mods=~all$age.c) 
 rma.typeAge
 ```
-<!-- ### comp vs prod -->
-<!-- ```{r comp-prod} -->
-<!-- rma.type=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id, mods=~all$type)  -->
-<!-- rma.type -->
-<!-- ``` -->
-<!-- ### comprehension -->
-<!-- ```{r comp} -->
-<!-- rma.comp=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,subset=c(all$type=="comp"))  -->
-<!-- rma.comp -->
-<!-- ``` -->
-<!-- ### production -->
-<!-- ```{r prod} -->
-<!-- rma.prod=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,subset=c(all$type=="prod"))  -->
-<!-- rma.prod -->
-<!-- ``` -->
-
 ### location
 ```{r loc}
 rma.loc=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,mods=~all$locgen) 
@@ -90,7 +69,7 @@ rma.loc
 ```
 ### language cat
 ```{r lang_cat}
-rma.lang_cat=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,mods=~all$lang_cat) 
+rma.lang_cat=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,mods=~all$lang_cat+all$age.c) 
 rma.lang_cat
 ```
 ### SES cat
@@ -98,12 +77,12 @@ rma.lang_cat
 rma.SES_cat=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,mods=~all$SES_cat) 
 rma.SES_cat
 ```
-### SES priority
+### SES priority #what the goal of the study to detect difference as a function of SES?
 ```{r SES_priority}
 rma.SES_priority=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,mods=~all$SES_priority) 
 rma.SES_priority
 ```
-### type of measure 
+### type of measure #if it was a direct measure in the child or not
 ```{r type_of_measure}
 rma.type_of_measure=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,mods=~all$type_of_measure) 
 rma.type_of_measure
