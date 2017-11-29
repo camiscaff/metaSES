@@ -1,0 +1,135 @@
+---
+title: "test wb ed"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Wordbank stuff
+
+```{r cars}
+library(devtools)
+install_github("langcog/wordbankr")
+library(wordbankr)
+install_github("langcog/langcog")
+library(langcog)
+library(dplyr)
+library(ggplot2)
+library(directlabels)
+#theme_set(theme_mikabr())
+#font <- theme_mikabr()$text$family
+#mode <- "local"
+#vocab_admins <- get_administration_data(mode = mode) %>%
+#vocab_admins <- get_administration_data("English", "WS") %>%
+vocab_admins <- read.csv("~/Dropbox/_anouck/administration_data(1).csv") %>%
+  select(data_id, language, form, age, mom_ed, comprehension,production) %>%
+  rename(momed = mom_ed) %>%
+  filter(!is.na(momed))
+
+summary(vocab_admins)
+```
+
+## collapse & exclude
+
+For comparability with rest of data, we take all months separately, and convert to continuous:
+
+- exclude no education
+- primary: 7 
+- some secondary: 10
+- secondary: 12
+- some college: 14
+- college: 16 
+- some graduate: 18
+- graduate: 20
+
+TODO: See if precise numbers above change things a lot 
+
+```{r pressure, echo=FALSE}
+edlev=c("College" ,"Graduate" ,"None", "Primary", "Secondary", "Some College", "Some Graduate", "Some Secondary")
+edlevy=c(16 ,20 ,NA, 7, 12, 14, 18, 10)
+
+vocab_admins$momedcont=NA
+for(i in 1:length(edlev)) vocab_admins[vocab_admins$momed==edlev[i],"momedcont"]<- edlevy[i]
+
+sumdat=NULL
+for(thisage in levels(as.factor(vocab_admins$age))) for(thislang in levels(vocab_admins$language)){
+	thisdat=subset(vocab_admins,age==thisage & language==thislang)
+	if(dim(thisdat)[1]>4){
+		thiscor.comp=cor.test(thisdat$momedcont,thisdat$comprehension)
+		thiscor.prod=cor.test(thisdat$momedcont,thisdat$production)
+		sumdat<-rbind(sumdat,cbind(thisage,thislang,dim(thisdat)[1],thiscor.comp$estimate,thiscor.comp$estimate))
+	}
+} 
+colnames(sumdat)<-c("age","lang","N","r.comp","r.prod")
+
+write.table(sumdat,"~/Dropbox/wb_momEdConv_age_lang.txt",row.names=F,quote=F,sep="\t")
+
+read.table("~/Dropbox/wb_momEdConv_age_lang.txt",header=T,sep="\t")->sumdat
+
+plot(sumdat$N~sumdat$r)
+plot(sumdat$r~sumdat$age)
+
+stacked=cbind(sumdat[,c("age","lang","N")],stack(sumdat[,c("r.comp","r.prod")]))
+
+library(metafor)
+dat=escalc(measure="COR",ri=stacked$values,ni=stacked$N)
+myrma=rma(yi=dat$yi,vi=dat$vi,mods=stacked$ind,measure="COR") #broken...
+forest(myrma)
+```
+
+## Anouck's data
+
+```{r comp-prod}
+comp <- read.table("comp.txt",sep="\t",header=T)
+comp=comp[,c("infant_group"  ,  "mean_age_1_days" ,"z"    ,  "n_1")]
+names(comp)<-c("id","age","z","n")
+comp$type="comp"
+
+prod <- read.table("prod.txt",sep="\t",header=T)
+prod=prod[,c("infant_group"  ,  "mean_age_1_days" ,"z"    ,  "n_1")]
+names(prod)<-c("id","age","z","n")
+prod$type="prod"
+
+all=rbind(comp,prod)
+
+#'\cr \url{http://www.mesasoftware.com/Papers/THE\%20INVERSE\%20FISHER\%20TRANSFORM.pdf}\cr
+#CHECK https://github.com/IlyaKipnis/DSTrading/blob/master/R/fisherTransform.R
+iFish <- function(x) {
+  return((exp(2*x)-1)/(exp(2*x)+1))
+}
+
+all$r=iFish(all$z)
+all$age.c<-all$age-mean(all$age,na.rm=T)
+all$se=sqrt(1/(all$n - 3))
+all$v=1/all$se
+all$type=factor(all$type)
+all[!is.na(all$r),]->all
+library(metafor)
+rma.all=rma(ri=all$r,ni=all$n,measure="ZCOR") 
+rma.type=rma(ri=all$r,ni=all$n,measure="ZCOR",mods=all$type) 
+rma.age=rma(ri=all$r,ni=all$n,measure="ZCOR",mods=all$age.c) 
+
+forest(rma.all)
+funnel(rma.all)
+regtest(rma.all)
+
+
+rma.comp=rma(ri=all$r,ni=all$n,measure="ZCOR",subset=c(all$type=="comp")) 
+rma.prod=rma(ri=all$r,ni=all$n,measure="ZCOR",subset=c(all$type=="prod")) 
+
+forest(rma.comp)
+funnel(rma.all)
+regtest(rma.all)
+
+sum(all$z*1/(all$se),na.rm=T)/sum(1/(all$se),na.rm=T)
+
+pdf("~/Desktop/age.pdf")
+plot(all$r~ all$age,cex=1+(all$n/max(all$n,na.rm=T)),col=ifelse(all$type=="comp","red","black"),xlab="Age (jours)",ylab="z",pch=20)
+lines(c(0,1500),c(0,0),lty=2)
+dev.off()
+
+
+```
+

@@ -1,0 +1,118 @@
+---
+title: "final analyses"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(metafor)
+library(RCurl)
+library(psych)
+comprehension_data <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vSVSYZBmJtjmvsOMr8FYVeKmlpFB-enl9UXByKbP4tcmJkI-FJqOhuJMrUo1aD872WETuVi9lmw1T2X/pub?gid=1713157627&single=true&output=csv"
+comprehension_data_again <- getURL(comprehension_data, ssl.verifypeer=FALSE)
+comp <- read.csv(textConnection(comprehension_data_again))
+write.table(comp,"comp.txt",row.names=F,sep="\t")
+
+
+```
+
+## Main analyses
+
+### put table together
+```{r combine-res}
+comp <- read.table("comp.txt",sep="\t",header=T,  dec = ",")
+# comp=comp[,c("infant_group","mean_age_1_days" ,"z", "n_1","r", "Location", "lang_measure", "language_cat", "SES_measure","SES_cat", "SES_as_primary", "type_of_measure" )]
+comp$type="comp"
+
+# prod <- read.table("prod.txt",sep="\t",header=T)
+# prod=prod[,c("infant_group"  ,  "mean_age_1_days" ,"r"    ,  "n_1", "Location")]
+# prod$type="prod"
+all=comp
+#all=rbind(comp,prod)
+names(all)<-c("id","age","z","n","r", "loc", "lang_measure", "lang_cat", "SES_measure", "SES_cat", "SES_priority", "type_of_measure","type")
+
+all$locgen=ifelse(all$loc=="United States","US","other")
+
+all$z=1/2*(log((1+all$r)/(1-all$r)))
+all$age.c <- all$age-mean(all$age,na.rm=T)
+all$se=sqrt(1/(all$n - 3))
+all$v=1/all$se
+all[!is.na(all$r),]->all
+write.table(all,"final.txt",row.names=F,sep="\t",quote=T)
+```
+### Main analyses
+
+
+```{r main}
+read.table("final.txt",header=T)->all
+
+rma.all=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id) 
+rma.all
+
+forest(rma.all)
+regtest(rma.all)
+
+pdf("~/Desktop/funnel.pdf",height=5,width=5)
+funnel(rma.all)
+points(all$se~all$z,pch=20,col="white")
+# points(all$se~all$z,subset=c(all$type=="prod"),pch=20,col="red")
+# points(all$se~all$z,subset=c(all$id=="notre_CCT"),pch=3,cex=2)
+# points(all$se~all$z,subset=c(all$id=="notre_CDI_production"),pch=3,cex=2)
+
+```
+### all moderators
+```{r moderators}
+rma.typeAge=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id, mods=~all$age.c) 
+rma.typeAge
+```
+<!-- ### comp vs prod -->
+<!-- ```{r comp-prod} -->
+<!-- rma.type=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id, mods=~all$type)  -->
+<!-- rma.type -->
+<!-- ``` -->
+<!-- ### comprehension -->
+<!-- ```{r comp} -->
+<!-- rma.comp=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,subset=c(all$type=="comp"))  -->
+<!-- rma.comp -->
+<!-- ``` -->
+<!-- ### production -->
+<!-- ```{r prod} -->
+<!-- rma.prod=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,subset=c(all$type=="prod"))  -->
+<!-- rma.prod -->
+<!-- ``` -->
+
+### location
+```{r loc}
+rma.loc=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,mods=~all$locgen) 
+rma.loc
+```
+### language cat
+```{r lang_cat}
+rma.lang_cat=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,mods=~all$lang_cat) 
+rma.lang_cat
+```
+### SES cat
+```{r SES_cat}
+rma.SES_cat=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,mods=~all$SES_cat) 
+rma.SES_cat
+```
+### SES priority
+```{r SES_priority}
+rma.SES_priority=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,mods=~all$SES_priority) 
+rma.SES_priority
+```
+### type of measure 
+```{r type_of_measure}
+rma.type_of_measure=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,mods=~all$type_of_measure) 
+rma.type_of_measure
+```
+### age
+```{r age}
+pdf("~/Desktop/age.pdf")
+plot(all$z~ all$age,cex=1+(all$n/max(all$n,na.rm=T)),col=ifelse(all$type=="comp","red","black"),xlab="Age (jours)",ylab="z",pch=20)
+lines(c(0,1500),c(0,0),lty=2)
+dev.off()
+
+
+```
+

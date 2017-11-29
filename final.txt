@@ -1,0 +1,16 @@
+"id"	"age"	"z"	"n"	"r"	"loc"	"lang_measure"	"lang_cat"	"SES_measure"	"SES_cat"	"SES_priority"	"type_of_measure"	"type"	"locgen"	"age.c"	"se"	"v"
+"
+1583_all"	1314.9	0.562729769352149	45	0.51	"United States"	"PPVT-III"	"PPVT"	"education_cat"	"education_based"	"yes"	"direct"	"comp"	"US"	594.304527027027	0.154303349962092	6.48074069840786
+"1590_all"	547.875	0.306226146252889	46	0.297	"England"	"OCDI"	"CDI"	"education_cat"	"education_based"	"no"	"indirect"	"comp"	"other"	-172.720472972973	0.152498570332605	6.557438524302
+"1591_all"	913.125	0.611240885190448	50	0.545	"United States"	"PPVT-III"	"PPVT"	"education_cat"	"education_based"	"no"	"direct"	"comp"	"US"	192.529527027027	0.145864991497895	6.85565460040104
+"1582_Study3"	401.775	0.4537785259527	24	0.425	"United States"	"CDI-WG"	"CDI"	"hollingshead"	"composite"	"no"	"indirect"	"comp"	"US"	-318.820472972973	0.218217890235992	4.58257569495584
+"1153_all"	1095.75	0.354092528962243	56	0.34	"United States"	"PPVT"	"PPVT"	"hollingshead_cont"	"composite"	"no"	"direct"	"comp"	"US"	375.154527027027	0.137360563948689	7.28010988928052
+"1133_infant"	367.685	-0.0801713250375897	659	-0.08	"United States"	"CDI Infant form"	"CDI"	"hollingshead_cont"	"composite"	"no"	"indirect"	"comp"	"US"	-352.910472972973	0.0390434404721515	25.6124969497314
+"1048_all"	1643.625	0.662462707371799	43	0.58	"United States"	"PPVT-III"	"PPVT"	"SES_composite"	"composite"	"no"	"direct"	"comp"	"US"	923.029527027027	0.158113883008419	6.32455532033676
+"1353_infant "	1120.1	0.287682072451781	147	0.28	"United States"	"PPVT-R"	"PPVT"	"education_cont"	"education_based"	"yes"	"direct"	"comp"	"US"	399.504527027027	0.0833333333333333	12
+"1585_highSES_study1"	493.391875	0.125542323193137	72	0.1248869026	"United States"	"CCT"	"CCT"	"education_cat"	"education_based"	"yes"	"direct"	"comp"	"US"	-227.203597972973	0.120385853085769	8.30662386291807
+"1585_highSES_study2"	493.391875	-0.100161648130375	68	-0.09982803441	"United States/Mexico"	"CCT"	"CCT"	"education_cat"	"education_based"	"yes"	"direct"	"comp"	"other"	-227.203597972973	0.124034734589208	8.06225774829855
+"1586_1"	1095.75	0.266075351709427	216	0.2599691791	"United States"	"PPVT-R"	"PPVT"	"education_cat"	"education_based"	"yes"	"direct"	"comp"	"US"	375.154527027027	0.0685188709827532	14.5945195193264
+"1587_1_study1"	553.9625	0.240146066182645	23	0.2356337104	"United States"	"CDI_WG"	"CDI"	"education_cat"	"education_based"	"no"	"indirect"	"comp"	"US"	-166.632972972973	0.223606797749979	4.47213595499958
+"1326_1_highSES"	730.5	0.19054640529856	92	0.188273297	"United States"	"PPVT-R"	"PPVT"	"other"	"income_based"	"no"	"direct"	"comp"	"US"	9.90452702702703	0.105999788000636	9.4339811320566
+"1326_3_highSES"	1095.75	0.640630739363093	237	0.565328863	"United States"	"PPVT-R"	"PPVT"	"other"	"income_based"	"no"	"direct"	"comp"	"US"	375.154527027027	0.0653720450460614	15.2970585407784

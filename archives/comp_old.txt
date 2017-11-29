@@ -1,0 +1,37 @@
+infant_group	mean_age_1_days	z	n_1	r	Location
+1583_all	1314.9	0.5627297694	45	0.51	United States
+1590_all	547.875	0.3062261463	46	0.297	England
+1591_all	913.125	0.6112408852	50	0.545	United States
+1582_Study3	401.775	0.453778526	24	0.425	United States
+1587_Study1	553.9625		50	NA	United States
+1589_rural_community	569.485625		378	NA	Mozambique
+1589_urban_community	562.789375		259	NA	Mozambique
+1153_all	1095.75	0.354092529	56	0.34	United States
+1133_infant	367.685	-0.08017132504	659	-0.08	United States
+données de notre étude CCT	949.65	0.3507042935	89	0.337	France
+1585_highSES_study1	493.391875	0.1255423232	72	0.1248869026	United States
+1585_lowSES_study1	493.391875				United States
+1585_highSES_study1	493.391875		72		United States
+1585_lowSES_study1	493.391875				United States
+1585_highSES_study2	493.391875	-0.1001616481	68	-0.09982803441	United States/Mexico
+1585_lowSES_study2	493.391875				United States/Mexico
+1585_highSES_study2	493.391875		68		United States/Mexico
+1585_lowSES_study2	493.391875				United States/Mexico
+1586_1	1095.75	0.2660753517	216	0.2599691791	NA
+1586_2	1095.75				NA
+1586_3	1095.75				NA
+1587_1_study1	553.9625	0.2401460662	23	0.2356337104	United States
+1587_3_study1	553.9625				United States
+1587_2_study1	553.9625				United States
+1587_4_study1	553.9625				United States
+1587_regression1	553.9625				United States
+1587_1_study1	553.9625		23		United States
+1587_3_study1	553.9625				United States
+1587_2_study1	553.9625				United States
+1587_4_study1	553.9625				United States
+1587_regression2	553.9625				United States
+1326_1_highSES	730.5	0.1905464053	92	0.188273297	United States
+1326_2_lowSES	730.5				United States
+1326_3_highSES	1095.75	0.6406307393	237	0.565328863	United States
+1326_4_lowSES	1095.75				United States
+1308_regression	1144.45				United States

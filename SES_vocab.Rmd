@@ -1,0 +1,306 @@
+---
+title: "Socio-economic status and word comprehension of infants: a meta-analytic review"
+author: 
+  - name          : "Camila Scaff"
+    affiliation   : "1"
+    corresponding : yes    # Define only one corresponding author
+    address       : "FILL IN"
+  - id            : "1"
+    institution   : "Ecole Normale Superieure, PSL Research University, Departement d'Etudes Cognitives, Laboratoire de Sciences Cognitives et Psycholinguistique (ENS, EHESS, CNRS)"
+date: "11/23/2017"
+output: papaja::apa6_pdf
+bibliography: SESmetavocab.bib
+class: man
+figsintext: no
+figurelist: no
+footnotelist: no
+keywords: keywords
+lang: english
+lineno: yes
+author_note: |
+  Complete departmental affiliations for each author (note the indentation, if you start a new paragraph).
+  Enter author note here.
+tablelist: no
+abstract: "
+  "
+wordcount: X
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+require(papaja)
+library(psych)
+library(metafor)
+
+
+```
+
+```{r combine-res, include=FALSE, echo=FALSE}
+comp <- read.table("comp.txt",sep="\t",header=T)
+comp=comp[,c("infant_group"  ,  "mean_age_1_days" ,"r"    ,  "n_1", "Location")]
+comp$type="comp"
+
+prod <- read.table("prod.txt",sep="\t",header=T)
+prod=prod[,c("infant_group"  ,  "mean_age_1_days" ,"r"    ,  "n_1", "Location")]
+prod$type="prod"
+
+all=rbind(comp,prod)
+names(all)<-c("id","age","r","n","loc","type")
+
+all$locgen=ifelse(all$loc=="United States","US","other")
+
+all$z=1/2*(log((1+all$r)/(1-all$r)))
+all$age.c <- all$age-mean(all$age,na.rm=T)
+all$se=sqrt(1/(all$n - 3))
+all$v=1/all$se
+all[!is.na(all$r),]->all
+write.table(all,"final.txt",row.names=F,sep="\t",quote=T)
+```
+
+```{r main ,include=FALSE}
+read.table("final.txt",header=T)->all
+
+rma.all=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id) 
+rma.all
+
+forest(rma.all)
+regtest(rma.all)
+
+pdf("~/Desktop/funnel.pdf",height=5,width=5)
+funnel(rma.all)
+points(all$se~all$z,pch=20,col="white")
+points(all$se~all$z,subset=c(all$type=="prod"),pch=20,col="red")
+points(all$se~all$z,subset=c(all$id=="notre_CCT"),pch=3,cex=2)
+points(all$se~all$z,subset=c(all$id=="notre_CDI_production"),pch=3,cex=2)
+
+```
+```{r moderators, include=FALSE}
+#all moderators
+rma.typeAge=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id, mods=~all$type*all$age.c) 
+rma.typeAge
+```
+
+```{r comp-prod, include=FALSE}
+### comp vs prod
+rma.type=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id, mods=~all$type) 
+rma.type
+```
+```{r comp, include=FALSE}
+### comprehension
+
+rma.comp=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,subset=c(all$type=="comp")) 
+rma.comp
+```
+```{r prod, include=FALSE}
+
+### production
+
+rma.prod=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,subset=c(all$type=="prod")) 
+rma.prod
+```
+
+```{r loc, include=FALSE}
+### location
+
+rma.loc=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,mods=~all$locgen) 
+rma.loc
+```
+
+```{r age,include=FALSE}
+### age
+
+pdf("~/Desktop/age.pdf")
+plot(all$z~ all$age,cex=1+(all$n/max(all$n,na.rm=T)),col=ifelse(all$type=="comp","red","black"),xlab="Age (jours)",ylab="z",pch=20)
+lines(c(0,1500),c(0,0),lty=2)
+dev.off()
+
+
+```
+
+<!-- *Constraints: -->
+<!-- Double-spacing throughout (abstract, body text, references) -->
+<!-- Using 12-point, Times New Roman font -->
+<!-- Having 1-inch margins -->
+<!-- 40 pages for Empirical Articles and Reviews, inclusive of everything, including a reference list that is no longer than 8 pages -->
+<!-- Introduction (but not labeled as such) -->
+<!-- Method -->
+<!-- Results -->
+<!-- Discussion -->
+<!-- References -->
+<!-- Tables and Figures -->
+<!-- The Method section must include participant demographic information, such as sex, SES, race or ethnicity, recruitment method, etc. -->
+<!-- Must be 120 words or fewer -->
+<!-- Include participants' numerical age -->
+<!-- Include total number of participants (Ns) -->
+<!-- Must be written in the third person, not first person -->
+<!-- Do not exceed 8 pages -->
+<!-- Are cited both in the body text and on the reference list -->
+<!-- Are listed in alphabetical order by authors' surname -->
+<!-- Include the DOI # when available* -->
+
+##Intro
+It has been stated during decades now the importance of early development for later cognitive skills (REF). A vast number of public policies in various countries has been applied to ameliorate and promote better "early days" for infants. Among the different policies and strategies, a special focus has been given to language development and achievements during infancy. Many interventions assessing cognitive skills in general actually focus mainly or only in language acquisition and unfolding (many refs haha). This seems a coherent move from governments and interventions because also studies have shown the correlation between early language skills and cognitive skills, a later to school achievement. 
+In another body of literature it has been shown that low socio-economic status is a disadvantage in various aspects of life, and from very early on. Since 
+
+
+Importance of early development in general cognitive functions
+Language seen like important predictor of later cognitive skills / life "achievement"
+Low SES is a disadvantage in various aspects of life
+Differences have been shown in several cognitive aspects during adullthood & childhood
+Also various studies have point-out differences in various linguistics levels, starting from early childhood and infancy
+Specifically vocabulary
+Multiple ways of assessing vocabulary knowledge in early chilhood
+We aim to review the effect of SES in early lexical acquisition, focusing only in infancy : up to 3yo
+We selected vocabulary as the outcome because of its critical importance to development across childhood, adolescence, and adulthood
+ promotes greater academic achievement (e.g., Melby & Conger, 1996).
+That is, better educated parents have been found to have young children with more advanced language development (Burchinal, Peisner-Feinberg, Pianta, & Howes, 2002; Gest, Freeman, Domitrovich, & Welsh, 2004; Hoff & Tian, 2005; Raviv, Kessenich, & Morrison, 2004; Turner & Johnson, 2003) and higher overall IQ (Linver et al., 2002). Interestingly, more educated mothers seem to expect their children to say first sounds and words and to “think” sooner (Hoff et al., 2002). Expecting more advanced child vocabulary will likely increase parents efforts to encourage younger children’s learning experiences via clear and responsive communication (see also Lareau, 2003).
+We selected vocabulary as the G3 outcome because of its critical importance to development across childhood, adolescence, and adulthood (Schoon, Parsons, Rush, & Law, 2010). Of particular relevance, children’s ability to understand a variety of words is an essential component of kindergarten readiness (Bierman et al., 2008; Doherty, 1997; Whitehurst & Lonigan, 1998). For instance, successful entry into kindergarten requires basic skills, many dependent on vocabulary, including abilities to understand explanations and follow instructions. Children with limited vocabularies should experience more difficulty during classroom activities. Such early academic problems, rather than fading with time, may place students on a persistent trajectory of academic problems (Shonkoff & Philips, 2000), including repeating a grade, requiring special education services, or leaving high school without obtaining a diploma (Brooks-Gunn, Guo, & Furstenberg, 1993; Ramey & Ramey, 2004).
+Moreover, young children with more advanced vocabulary do better in school over time and demonstrate greater academic achievement (Jorgenson & Jorgenson, 1996). Consequently, preschool-aged G3 children with larger vocabularies will likely eventually achieve more academically on average and thus have access to more diverse higher educational and career opportunities. Similarly, it is likely that the G2 young adults who achieved the most academically typically had above average vocabulary skills as young children.
+
+
+
+##Measuring SES
+Socioeconomic status refers to specific quote. But in general reflects the situation of the household in terms of economic and social resources
+Different ways to estimate this measure that ranges from single measures such as annual income or maternal education, or composites taking into account both of these criteria plus parental occupation or neighborhood.
+Research has suggested to look into these different measures as independent  factors
+Others argue that Maternal education, the most common in children language acquistion correlates well enough with a often use composite measure; the Hollingshed index ref + definition
+For this study we take into account the all range of SES presented in the litterature. We ackowledge that dichotomies such as High and Low SES are arbitrary decisions taken at a given time for a given population
+Just as farah et al executive function paper with profit from the variation of the measure and apply it as moderator in order to examine whether the measures used to estimate child socioeconomic studies influence the strength of the SES - word comprehension relationship.
+
+##Measuring word comprehension
+
+
+
+##Goals of the current meta-analysis
+
+
+
+
+
+
+
+
+Method 
+
+Search procedures and selection of studies
+Studies were identified through searches of the "Pubmed" engine throughout  September 2016
+ using as keywords "Socio-economic-status" "language" filter from birth to 23 months, and exclusively using the same words but filtering only for preschool.
+This search was on purpose not focusing specifically in vocabulary but in language in general, by this mean a big database was created with 
+ The search required that at least it was mentioned in the abstract studies evaluating language in the appropriate age range.
+ Identified studies required
+
+1.1 Literature search
+
+1.2 Inclusion criteria
+
+1.3 Eligible word comprehension and SES measures
+
+1.4 selection of studies
+
+2. Effect size and moderator coding procedure
+
+2.1 Effect size coding
+
+2.2 Moderator Coding 
+
+Sample characteristics
+
+Age range
+Intended sampleSES
+Amount of SES variability in the sample
+Extent of exclusionary criteria
+Racial/ethnic composition
+Mean age
+Sex composition
+
+Effect size characteirstics
+
+Category of SES construct
+Number of measures used to calculate the SES variable
+Category of Word comprehension construct
+Number of measures used to calculate the word comprehension variable
+
+Publication characteristics
+
+Type of publication
+SES as a primary focus
+
+3.  Analytical procedures
+
+3.1 Calculating average effect size
+3.2 statistical independence
+3.3 Fixed and random effect models
+3.4 Test for heterogeneity
+3.5 Moderator Analysis
+3.5 Test for publication bias
+
+
+RESULTS
+
+Study characteristics
+Overall effect size
+Tests for heterogeneity 
+
+4. Moderator analysis
+4.1 Sample chracteristics
+4.2 Effect size charateristics
+4.3 Publication characteristics
+4.4 publication bias
+
+Discussion
+
+
+
+
+
+
+Eligibility Criteria for Study Inclusion
+Typing "language" & SES in pubmed search
+
+
+ We excluded studies that reported vocabulary outcomes and socioeconomic status differences. 
+ as well as studies that only reported outcomes in language or executive function. If two or more studies referred to the same population, the study that had evaluated the effect of SES on cognitive outcome as a stated objective was included in the review. If two or more, or none, of the studies referring to the same population had that objective, the most recently published article that reported the cognitive outcome of the partici- pants at an older age was selected.
+
+Data Sources and Search Strategy
+
+We searched electronic databases MEDLINE, EMBASE, PsycINFO and Social Science Citation Index using the following search terms, both as keywords and as subject headings: ((‘‘preterm’’ or ‘‘premature’’) and (‘‘birth’’ or ‘‘delivery’’ or ‘‘infant’’)) or (‘‘prematurity’’ or ‘‘low birth weight’’) and (‘‘social’’ or ‘‘socioeconomic’’ or ‘‘sociode- mographic’’ or ‘‘environment*’’) and (‘‘intelligence’’ or ‘‘IQ’’ or ‘‘cogniti*’’ or ‘‘academic’’ or ‘‘development’’). The ‘‘explode’’ feature was used with subject headings to include articles categorized under more specific subhead- ings. The search was restricted to English-language articles published between January 1990 and July 2011, in order to avoid study populations born before 1990. The title and abstract of all studies retrieved from the electronic search were screened to identify case–control or cohort studies that reported cognitive outcomes among children born preterm, VLBW or ELBW. The full text of all relevant studies identified from the initial screen were then evaluated to select articles that reported the effect of at least one SES indicator on cognitive outcome. The elec- tronic search was supplemented by a manual search of the reference lists of studies that met the eligibility criteria for inclusion. 
+
+Study Quality Assessment
+We assessed the quality of included studies based on their design, representativeness of the study population, quality of the SES data, quality of the outcome data and appro- priateness of statistical analyses, using an appraisal checklist adapted from the Quality Assessment Tool for Quantitative Studies of the Effective Public Health Practice Project [20] (Table 1). The aim of the appraisal is to pro- vide a descriptive score of the external validity of the effect of SES reported by the studies. Each study was given a component rating of ‘‘strong’’, ‘‘moderate’’ or ‘‘weak’’ in each of the five areas assessed. A global quality rating was then assigned to the studies based on the component rat- ings. Studies that did not receive any ‘‘weak’’ component rating were judged ‘‘strong’’ globally. Studies that received one ‘‘weak’’ component rating were assigned a global rating of ‘‘moderate’’ and studies were considered ‘‘weak’’ globally if they received two or more ‘‘weak’’ component ratings. No study was excluded from the review on the basis of its quality
+
+ Data Extraction
+
+From each included study, we extracted data on: (1) study characteristics, such as population, setting and sampling methods; (2) cognitive measures including participants’ ages at cognitive assessment and type of assessment tools employed; (3) types of SES indicators used and the defi- nitions for categorization; and (4) statistical tests used and the direction, magnitude and statistical significance of the effect of each SES indicator on cognitive outcome. The variables included as confounders in multivariable analyses were also recorded. If the article reported results from repeated cognitive assessment at different time points, the data obtained from participants at the older age were extracted. No attempt was made to contact authors for additional data missing from the published article.
+
+Data Synthesis
+
+SES indicators were classified into four categories: indi- vidual-level, family-structure, contextual and composite indicators. The number of studies that evaluated each SES indicator and the proportion of studies that reported a sta- tistically significant effect of the SES indicator on cogni- tive outcome were calculated. The range of the magnitude of effect of SES indicators on cognitive outcomes reported by the studies was recorded, focusing on results that had been appropriately adjusted for confounders. The 5 %level was used to define statistical significance
+
+
+Flowchart
+The literature search yielded 4,162 unique articles with 19 studies meeting the eligibility criteria. Seven studies were based on the same three populations. As none of these studies had specifically aimed to evaluate the effect of SES on cognitive outcome, the most recently published article was selected, resulting in 15 studies [21–35] included in the review (Fig. 1). All included studies had adopted a longi- tudinal cohort design. No additional study was identified from the manual search. The characteristics of the studies are summarized in
+Table 2. Thirteen studies reported the effect of SES on cognitive outcome assessed at a single point in time [21–33]. Of these, five had conducted the assessment before the age of 2 years [26, 28, 29, 32, 33], four at pre- school-age (ages 3–4 years) [23–25, 30] and four at school- age (age older than 5 years) [21, 22, 27, 31]. Three studies reported the effect of SES on the change in cognitive status over time [32, 34, 35]. Depending Depending on the cognitive assessment employed, cognitive scores were expressed as developmental quo- tients, Mental Development Index (MDI) from the Bayley Scales of Development, Mental Processing Composite from the Kaufman Assessment Battery for Children, reading and mathematics scores from the Wechsler Indi- vidual Achievement Test-II and IQ. Overall, the quality of the data on SES was high (Table 3). Three studies [22, 25, 30] received ‘‘weak’ Matern Child Health J (2013) 17:1689–1700
+component ratings for their analyses as they did not ade- quately adjust for confounders and had reported the effect of SES on cognitive outcome using bivariate analyses.
+Types of SES Indicator
+Thirteen indicators of SES were evaluated by the included studies (Table 4). Maternal educational level was the most frequently used SES indicator. Maternal age at birth and race/ethnicity were used as proxy indicators of SES. The use of medical insurance status as a SES indicator was unique to studies based in the USA. The composite indi- cator of ‘‘social risk’’ comprised several individual-level indicators. Piecuch et al. [30] defined high ‘‘social risk’’ as one or more of maternal education under 12 years, com- plete unemployment in a household and dependence on government assistance for health insurance. Hack et al. [26] derived an ordinal ‘‘social risk’’ score based on maternal marital status, race and educational level. In a separate study, Hack et al. [34] derived a composite indi- cator of SES using the mean of z scores of maternal edu- cation and neighbourhood median family income. Both contextual indicators listed in Table 4 were used in the study by Hack et al. [34] to describe the effect of SES on the the change in cognitive status over time.
+
+Nous avons effectué une méta-analyse sur un corpus de 12 articles portant sur l’impact du niveau socio-économique des parents sur le vocabulaire de leur enfant. Pour sélectionner ces articles nous avons choisi des critères en rapport avec notre étude expérimentale précédente. Nous nous sommes concentrés sur les mêmes types de tests que nous avons réalisé, c’est à dire le CDI (IFDC en français), le CCT mais aussi le Peabody Picture Vocabulary Test (PPVT) car c’est une version non numérique du CCT où l’enfant doit montrer parmi 2 ou 4 images celle nommée par l’expérimentateur (Rice & Watkins, 1996). Nous avons donc étudié la compréhension (CCT, PPVT, CDI) et la production (CDI) du vocabulaire des enfants. Les enfants devaient aussi être âgés de moins de 42 mois. J’ai sélectionné ce sous-ensemble d‘articles d’une plus grande sélection réalisée par l’équipe. Cette grande sélection résulte d’une recherche sur pubmed avec des critères plus larges : rassembler tous les articles qui traitent de l’influence du niveau socio-économique sur le langage de l’enfant de moins de 6 ans. Du fait de mes critères précis cités plus haut, je n’ai pas pu inclure un grand nombre d’articles, c’est pourquoi ma méta-analyse porte sur 12 articles au total.
+L’objectif est d'estimer la taille d’effet, une mesure qui indique la force de la relation entre deux variables. Ici nous cherchons à observer la force de la relation entre le milieu socio-économique et le vocabulaire de l’enfant. Pour intégrer les résultats dans une analyse quantitative, il est nécessaire d’avoir des échantillons mutuellement indépendants et non liés. Si ces échantillons sont liés, c’est-à-dire si plusieurs mesures sont effectuées sur les mêmes enfants à l’intérieur d’un papier,  nous les fusionnons en prenant la moyenne. Par exemple, si à l’intérieur d’un papier, les mêmes enfants sont testés avec plusieurs tests de compréhension (CDI Compréhension + CCT), alors ces échantillons sont considérés comme liés, et donc leurs corrélations sont fusionnées. Pour les données où nous n’avons pas une corrélation mais plutôt un contraste entre deux groupes, nous utilisons les différences de moyenne standardisée d, puis appliquons une formule de conversion d → r. Pour déterminer la précision de chaque taille d’effet, nous calculons l’erreur type qui prend en compte le nombre d’enfants testés. Plus ce nombre d’enfants testés est grand, plus l’étude est précise, et donc plus elle a du poids dans l’analyse globale. Afin que les corrélations soient comparables, nous utilisons la transformation de Fisher pour les convertir en z.
+
+Results
+Les analyses ont été réalisées principalement sur excel, puis vérifiés avec des packages R (metafor, Viechtbauer 2010). Pour pouvoir analyser toutes les données de la littérature et pouvoir les comparer entre elles, nous réalisons un graphique en entonnoir, qui montre la taille d’effet en fonction de la précision de l’étude. Plus le nombre de sujet d’une étude est grand, plus l’étude est considérée comme précise et donc plus elle se rapproche de la valeur moyenne de l’ensemble des études, ce qui représente notre meilleure estimation de la vraie valeur d’association. Ces études où la précision est importante se trouvent donc en haut du graphique, proche de la moyenne puisque l’intervalle de confiance, et donc les fluctuations d’échantillonnage sont moins importants. Cependant, nous remarquons que les données les plus précises ne sont pas toujours celles qui se rapprochent de la moyenne et donc de la vraie valeur. Nous observons que l’étude la plus précise des données étudiant la compréhension (figure 7) correspond à celle où les enfants sont les plus jeunes (figure 8). C’est donc peut être dû au fait que les enfants sont très jeunes comparés aux autres enfants, que cette taille de l’effet s’éloigne de la valeur moyenne.
+Un graphique en entonnoir permet aussi de visualiser s’il existe des biais de publication. Pour qu’il n’y ait pas de biais de publication, il faut que le nuage de points représente un entonnoir symétrique (représenté par le triangle blanc), avec autant d’études de part et d’autres de la valeur moyenne. Notre graphique nous montre qu’il n’y a pas de biais de publication (test for funnel plot asymmetry: z = 1,0926, p = 0,2746).
+
+Figure 7 : Graphique en entonnoir montrant la taille d’effet (z) des études en fonction de leur précision (Erreur type de la taille d’effet).
+Les études étudiant la production des enfants (tests : CDI production) sont représentées par les cercles rouge. Les études étudiant la compréhension des enfants (tests : CCT, PPVT, CDI compréhension) sont représentées par les cercles blanc. Les deux cercles avec des croix représentent nos études en crèches. Celui en rouge correspond à notre test du CDI pour les données de production, et celui en blanc correspond à notre test sur tablette tactile (CCT) étudiant la compréhension de l’enfant.
+
+
+Une méta-régression révèle que la taille d’effet, quand toutes les données sont prises en compte est de 0,25. Lors de notre première étude (tests expérimentaux), nous avons observé un effet plus fort pour le CDI production (r = 0,493) que pour le test de compréhension sur tablette (r = 0,337), ce qui va dans le même sens que les résultats de Vogt et ses collaborateurs (2015), qui observent de plus grands effets du niveau d’études de la mère sur la production que sur la compréhension au Mozambique. Nous avons donc vérifié si le mode de test avait un impact sur le coefficient d’association. Une méta-régression ajustée sur les 13 données de compréhension des enfants est de 0,29, alors que celles pour les 9 données de production est de 0,19. Contrairement à notre étude et celle de Vogt, les tailles d’effet pour les études étudiant la compréhension de l’enfant sont généralement plus grandes que celles étudiant la production (figure 7), mais cette différence n’est pas significative. 
+
+Figure 8 : Taille de l’effet en fonction de l’âge de l’enfant et du type de test
+
+Nous avons ensuite observé si la taille d’effet était influencée par l’âge. D’après la figure 8, nous pouvons voir que la taille d’effet augmente avec l’âge pour les résultats des mesures de compréhension de l’enfant, mais cela n’est pas le cas pour les résultats de production, pour lesquels la taille d’effet ne change pas avec l’âge. Une méta-régression déclarant le type de mesure (production, compréhension), l’âge, ainsi que leur intéraction, ne révèle néanmoins pas une intéraction significative, mais seulement un effet principal de l’âge.
+Discussion
+
+References

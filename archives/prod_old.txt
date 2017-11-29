@@ -1,0 +1,13 @@
+infant_group	n_1	mean_age_1_days	z	r	Location
+1582_Study1	26	730.5		NA	United States
+1582_Study3	24	657.45	0.453778526	0.425	United States
+1587_Study2	25	891.81875		NA	United States
+1033_all	48	547.875	0.354092529	0.34	United States
+1033_all	48	730.5	0.2985662637	0.29	United States
+1133_infant	659	367.685		NA	United States
+1133_toddler	1130	698.540625	0.05004172928	0.05	United States
+1092_all	233	720.76	0.09024418786	0.09	United States
+notre_CDI_production	75	949.65	0.540015897	0.493	France
+1585_highSES_study1	72	493.391875	0.05364786077	0.05359645211	United States
+1585_highSES_study2	68	493.391875	-0.04988953104	-0.0498481811	United States/Mexico
+1587	11	891.81875	-0.01435147905	-0.01435049383	United States

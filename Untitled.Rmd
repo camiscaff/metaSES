@@ -1,0 +1,329 @@
+---
+title: "Socio-economic status and word comprehension of infants: a meta-analytic review"
+author: 
+  - name          : "Camila Scaff"
+    affiliation   : "1"
+    corresponding : yes    # Define only one corresponding author
+    address       : "FILL IN"
+  - id            : "1"
+    institution   : "Ecole Normale Superieure, PSL Research University, Departement d'Etudes Cognitives, Laboratoire de Sciences Cognitives et Psycholinguistique (ENS, EHESS, CNRS)"
+date: "11/23/2017"
+output: papaja::apa6_pdf
+bibliography: SESmetavocab.bib
+class: man
+figsintext: no
+figurelist: no
+footnotelist: no
+keywords: keywords
+lang: english
+lineno: yes
+author_note: |
+  Complete departmental affiliations for each author (note the indentation, if you start a new paragraph).
+  Enter author note here.
+tablelist: no
+abstract: "
+  "
+wordcount: X
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+require(papaja)
+library(psych)
+library(metafor)
+
+
+```
+
+```{r combine-res, include=FALSE, echo=FALSE}
+comp <- read.table("comp.txt",sep="\t",header=T)
+comp=comp[,c("infant_group"  ,  "mean_age_1_days" ,"r"    ,  "n_1", "Location")]
+comp$type="comp"
+
+prod <- read.table("prod.txt",sep="\t",header=T)
+prod=prod[,c("infant_group"  ,  "mean_age_1_days" ,"r"    ,  "n_1", "Location")]
+prod$type="prod"
+
+all=rbind(comp,prod)
+names(all)<-c("id","age","r","n","loc","type")
+
+all$locgen=ifelse(all$loc=="United States","US","other")
+
+all$z=1/2*(log((1+all$r)/(1-all$r)))
+all$age.c <- all$age-mean(all$age,na.rm=T)
+all$se=sqrt(1/(all$n - 3))
+all$v=1/all$se
+all[!is.na(all$r),]->all
+write.table(all,"final.txt",row.names=F,sep="\t",quote=T)
+```
+
+```{r main ,include=FALSE}
+read.table("final.txt",header=T)->all
+
+rma.all=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id) 
+rma.all
+
+forest(rma.all)
+regtest(rma.all)
+
+pdf("~/Desktop/funnel.pdf",height=5,width=5)
+funnel(rma.all)
+points(all$se~all$z,pch=20,col="white")
+points(all$se~all$z,subset=c(all$type=="prod"),pch=20,col="red")
+points(all$se~all$z,subset=c(all$id=="notre_CCT"),pch=3,cex=2)
+points(all$se~all$z,subset=c(all$id=="notre_CDI_production"),pch=3,cex=2)
+
+```
+```{r moderators, include=FALSE}
+##all moderators
+#age
+rma.typeAge=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id, mods=~all$type*all$age.c) 
+rma.typeAge
+
+#SES measure
+
+```
+
+```{r comp-prod, include=FALSE}
+### comp vs prod
+rma.type=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id, mods=~all$type) 
+rma.type
+```
+```{r comp, include=FALSE}
+### comprehension
+
+rma.comp=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,subset=c(all$type=="comp")) 
+rma.comp
+```
+```{r prod, include=FALSE}
+
+### production
+
+rma.prod=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,subset=c(all$type=="prod")) 
+rma.prod
+```
+
+```{r loc, include=FALSE}
+### location
+
+rma.loc=rma(ri=all$r,ni=all$n,measure="ZCOR",slab=all$id,mods=~all$locgen) 
+rma.loc
+```
+
+```{r age,include=FALSE}
+### age
+
+pdf("~/Desktop/age.pdf")
+plot(all$z~ all$age,cex=1+(all$n/max(all$n,na.rm=T)),col=ifelse(all$type=="comp","red","black"),xlab="Age (jours)",ylab="z",pch=20)
+lines(c(0,1500),c(0,0),lty=2)
+dev.off()
+
+
+```
+
+<!-- *Constraints: -->
+<!-- Double-spacing throughout (abstract, body text, references) -->
+<!-- Using 12-point, Times New Roman font -->
+<!-- Having 1-inch margins -->
+<!-- 40 pages for Empirical Articles and Reviews, inclusive of everything, including a reference list that is no longer than 8 pages -->
+<!-- Introduction (but not labeled as such) -->
+<!-- Method -->
+<!-- Results -->
+<!-- Discussion -->
+<!-- References -->
+<!-- Tables and Figures -->
+<!-- The Method section must include participant demographic information, such as sex, SES, race or ethnicity, recruitment method, etc. -->
+<!-- Must be 120 words or fewer -->
+<!-- Include participants' numerical age -->
+<!-- Include total number of participants (Ns) -->
+<!-- Must be written in the third person, not first person -->
+<!-- Do not exceed 8 pages -->
+<!-- Are cited both in the body text and on the reference list -->
+<!-- Are listed in alphabetical order by authors' surname -->
+<!-- Include the DOI # when available* -->
+
+##Intro
+## Why may SES correlate with child vocabulary?
+## Why may SES correlate with child vocabulary?
+
+There are many reasons why SES could predict vocabulary, at variable levels of specificity. At a highly general level, food uncertainty, exposure to toxins, and poorer sleep quality are more widespread among less wealthy individuals [@bradley2002socioeconomic]. These organic factors could have generalized effects for instance on brain development [@farah2006childhood], and thus cause general attentional and memory problems that would interfere with learning in general, including vocabulary learning [@gathercole1989evaluation].  
+
+In the other extreme of specificity, perhaps SES is correlated with certain parental behaviors that promote or hinder lexical acquisition partially due to differences in beliefs pertaining to child development [@rowe2008child]. This may be, according to [@hart1995meaningful], the main reason why children from lower SES households never catch up with their more fortunate peers. According to their longitudinal work and that of others (e.g., [@hoff2003specificity]), input quantity, and certain dimensions of quality, explain away SES effects on children's productive vocabulary. These studies, however, often rely on children's spontaneous speech samples gathered in the same conversations from which the parental input measures are extracted. In such cases, parental education may not explain any additional variance above and beyond parental speech directed to the child simply because the predictor and outcome are factually collinear. It is important to note that in spontaneous situations child and adult language mutually affect each other: what the child says will depend on adult speech that, in turn, will be influenced by child production. Indeed, previous studies [@rowe2008child,@rowe2012longitudinal] used independent evidence to measure vocabulary comprehension instead of production (the Peabody Picture Vocabulary Test [@dunn1997ppvt], to which we will return below), and found parental education to be a stable predictor of vocabulary above and beyond both quantitative and qualitative variation in the input, at 30 and 42 months of age, with smaller effects at 54 months of age.
+
+In short, there seem to be many indirect and general, and potentially also direct and specific, pathways through which parental socio-economic status should predict vocabulary, even in early childhood. Indeed, a rapid review of the literature could leave readers with the impression that this effect is profound and widespread. However, we believe the matter is far from closed, as previous evidence suffers from a number of limitations that will be detailed below. Before reviewing this literature, we would like to sustain that properly describing the statistical relationship between SES and lexical development is not only interesting from a societal viewpoint, given that early vocabulary is an important predictor of school achievement [@white1982relation], but also on theoretical grounds, given the many factors noted above that predict large inter-individual differences should ensue from SES variation. To the extent that this predicted statistical relationship is not found, this would trigger further reflection on whether our theories of lexical acquisition hold up, or whether instead there is remarkable resilience in that somewhat peripheral, non-productive aspect of the language system.
+It has been stated during decades now the importance of early development for later cognitive skills (REF). A vast number of public policies in various countries has been applied to ameliorate and promote better "early days" for infants. Among the different policies and strategies, a special focus has been given to language development and achievements during infancy. Many interventions assessing cognitive skills in general actually focus mainly or only in language acquisition and unfolding (many refs haha). This seems a coherent move from governments and interventions because also studies have shown the correlation between early language skills and cognitive skills, a later to school achievement. Better educated parents have been found to have young children with more advanced language development (Burchinal, Peisner-Feinberg, Pianta, & Howes, 2002; Gest, Freeman, Domitrovich, & Welsh, 2004; Hoff & Tian, 2005; Raviv, Kessenich, & Morrison, 2004; Turner & Johnson, 2003) and higher overall IQ (Linver et al., 2002). Interestingly, more educated mothers seem to expect their children to say first sounds and words and to “think” sooner (Hoff et al., 2002). Expecting more advanced child vocabulary will likely increase parents efforts to encourage younger children’s learning experiences via clear and responsive communication (see also Lareau, 2003).
+In another body of literature it has been shown that low socio-economic status presents a disadvantage in various aspects of life, and from very early on. Differences have been shown in several cognitive aspects during adullthood & childhood. Also various studies have point-out differences in various linguistics levels, starting from early childhood and infancy, specifically vocabulary. We aim to review the effect of SES in early lexical acquisition, focusing only in infancy : up to 3yo. They are available already metanalytic reviews but not for the first period of life. ref for children and review for adolescents.We selected vocabulary as the outcome because of its critical importance to development across childhood, adolescence, and adulthood (Schoon, Parsons, Rush, & Law, 2010). Of particular relevance, children’s ability to understand a variety of words is an essential component of kindergarten readiness (Bierman et al., 2008; Doherty, 1997; Whitehurst & Lonigan, 1998). For instance, successful entry into kindergarten requires basic skills, many dependent on vocabulary, including abilities to understand explanations and follow instructions. Children with limited vocabularies should experience more difficulty during classroom activities. Such early academic problems, rather than fading with time, may place students on a persistent trajectory of academic problems (Shonkoff & Philips, 2000), including repeating a grade, requiring special education services, or leaving high school without obtaining a diploma (Brooks-Gunn, Guo, & Furstenberg, 1993; Ramey & Ramey, 2004).
+Moreover, young children with more advanced vocabulary do better in school over time and demonstrate greater academic achievement (Jorgenson & Jorgenson, 1996). Consequently, preschool-aged children with larger vocabularies will likely eventually achieve more academically on average and thus have access to more diverse higher educational and career opportunities. Similarly, it is likely that the young adults who achieved the most academically typically had above average vocabulary skills as young children.
+
+##Measuring SES
+Socioeconomic status refers to specific quote. But in general reflects the situation of the household in terms of economic and social resources
+Different ways to estimate this measure that ranges from single measures such as annual income or maternal education, or composites taking into account both of these criteria plus parental occupation or neighborhood.
+Research has suggested to look into these different measures as independent  factors
+Others argue that Maternal education, the most common in children language acquistion correlates well enough with a often use composite measure; the Hollingshed index ref + definition
+For this study we take into account the all range of SES presented in the litterature. We ackowledge that dichotomies such as High and Low SES are arbitrary decisions taken at a given time for a given population
+Just as farah et al executive function paper with profit from the variation of the measure and apply it as moderator in order to examine whether the measures used to estimate child socioeconomic studies influence the strength of the SES - word comprehension relationship.
+
+##Measuring word comprehension
+## SES and young children's vocabulary: Three mainstream outcome measures
+As a function of the outcome measure used, there are three distinct bodies of literature reporting on the relationship between caregiver socio-economic status and young children's vocabulary. The first body investigates how children's spontaneous speech relates to SES, often with the goal of understanding the role that parental input plays in the process (e.g., [@hoff2003specificity,@rowe2008,@huttenlocher2010sources]). The majority of this work has been carried out in the United States, where SES is often confounded with linguistic differences, namely increased degrees of bilingualism among poorer compared to richer samples. Even when bilingualism is controlled for, caregivers varying in SES may also vary crucially on cultural factors that relate to child verbosity. For instance, if children's word processing is viewed only via a behavior that is less culturally appropriate, then such measures of knowledge are intrinsically biased. 
+
+A second body of literature uses parental vocabulary checklists to measure children's lexical comprehension and production; the mostly widely used is the MacArthur Communicative Development Inventory (CDI). Adaptations of the CDI have been carried out in several other languages, and a recent initiative has built a centralized, cross-linguistic repository containing literally thousands of individual children's records [@frank2017wordbank]. However. it should be taken into account that different factors may affect the validity of this measure, not only memory demands but also education may reduce parents' accuracy in mentioning all the words likely to be part of an infant's vocabulary. Indeed, reports on SES-vocabulary relations within this body of work are often incidental. Whereas some studies documented significantly lower expressive vocabulary in low-income children [@arriaga1998scores] others do not demonstrate the expected positive correlation. For example, in [@fenson1994variability] and in [@feldman2000measurement], the opposite was found for early vocabulary comprehension. It was hypothesized that parents with fewer years of education tended to over-estimate their child's vocabulary knowledge. Indeed, [@fenson1994variability] posited that, as early vocabulary is highly variable, the current findings do not dismiss the possibility of over and under-estimations. This illustrates that, as any report-based instrument, the CDI is subject to diverse biases as a function of parental SES. 
+
+The third body of work uses direct tests of children's word comprehension, typically a structured task in which the child needs to produce an appropriate behavioral response. One of the most common instrument in this case is the Peabody Picture Vocabulary Test (or PPVT), which has been standardized in the United States for English- and Spanish-speaking populations and adapted in other countries. The PPVT is administered by showing the child a set of 4 pictures at a time, and asking him/her to 'point to the X'. This task may be more familiar to children who are frequently engaged in question-answer games  designed for didactic purposes, or picture-pointing activities during joint book reading, all activities that may be more appropriate and common in certain cultural settings than others [@heath1983ways]. An additional issue arises from the fact that, in the PPVT, scores are determined by the number of trials completed because trials are sorted in terms of difficulty. It is conceivable that differences in attention and ability to concentrate on a repetitive task will lead to lower scores, even if the children are equally good at word comprehension.
+
+## SES and young children's vocabulary: Two novel laboratory-based measures
+Two very recent strands within this third body try to circumvent these issues by either proposing children a passive task that takes visual orientation to a lexical target as a measure of vocabulary comprehension and requires no overt response, or by developing an active task, characterized by transparent contingencies that requires the child to respond to a spoken word or sentence. 
+
+
+[@fernald2013ses] used an implementation of the looking-while-listening paradigm (LWL) to investigate word comprehension in 48 English-learning toddlers tested in the United States. Children were classified into a 'low' or 'high' SES using the family's Hollingshead Index. Maternal education overlapped across the groups, and both low and high groups had a range encompassing 12 to 18 years of education, although the averages were significantly different, at 14 (some college) versus 17 (post-baccalaurate) years. Children were tested twice, at 18 and 24 months. During each test, the infant viewed on a large screen up to 32 (at 18 months) or 16 (at 24 months) experimental trials. In each trial, a pair of pictures was shown, and shortly after the audio asked 'Where's the X? Look at the X'. There were 8 lexical items used, all judged to be well-known to most toddlers; moreover, if a given child did not know a word, according to parental report, then all trials including that item were excluded from consideration. These items were repeated counterbalancing side and/or which item served as target or distractor four times for the 18-month test, and twice for the 24-month test. Accuracy was defined as the mean proportion of time the toddler looked at the picture matching the verbal prompt (the target) out of the total time spent on either the target or the distractor within a certain window. Additionally, if the child was looking at the distractor at the onset of the keyword and shifted to the right picture within the analysis window, then a measure of response time was defined as the latency between the word onset and the beginning of the visual shift. Caregivers also filled in a CDI. Results showed that SES predicted all three lexical measures: Children whose parents had a higher SES had larger vocabularies, higher accuracies and shorter response times, at both 18 months and 24 months (with no age interaction). Interestingly, the correlation coefficients for the two direct measures (e.g., at 18 months r=.52 and .5, respectively) were higher than that found for the parental checklist (r=.34). The results of this type of studies with Spanish-learning children are not conclusive regarding SES differences affecting response time. In a cross-sectional study, [@hurtado2007spoken] used this on-line processing task to analize word comprehension in a sample of 49 Spanish-learning latino toddlers living in USA (15, 18 and 24 months). Although the sample was mainly from low SES backgrounds, maternal education ranged from  3 years to 18 years, enabling the researchers to study intra-group distinctions. Results showed that measures of accuracy and reaction time were both moderately but significantly correlated with maternal education. Controlling for age and vocabulary size as measured by CDI, maternal education still contributed to explain additional variance to differences in comprehension. However, in a longitudinal sample  of 27 Latino children, [@hurtado2008does] found that reaction time was uncorrelated with SES, measured by the Hollingshead Index. In the latter work, Hurtado and colleagues replicate previous findings that quantity of speech directed to the child predicts vocabulary size, but have further shown that the child's individual response time, as a measure of speed of processing drawn from this task, mediates that input-outcome relationship. The authors interpreted this relationship to be the potential mechanistic pathway (input influences speed of processing, and therefore informational uptake, and therefore lexical development). 
+
+One potential limitation of this otherwise promising technique is that it requires specialized equipment, as the child needs to sit in a control environment,  in front of a very large screen. Children from different SES could react to such a novel situation quite differently. Another limitation is related to the relationship between speech processing and overall cognitive abilities. [@fernald2006picking] did not find correlations between performance in this task and in one non-linguistic task, which measured the delay in visual orienting. Although this probably means that differences in speed of processing to a named picture are not accounted for by more general differences in speed of oculomotor response during visual orienting, it is still unclear to what extent the predictive power of the task or the individual differences measured relate exclusively or primarily to lexical processing rather than information processing more generally. Indeed, given that the task isolates processing speed by using highly known words, that are furthermore repeated, cognitive processing abilities at higher levels might be very influential. 
+
+
+The Computerized Comprehension Task (CCT) is another promising technique to measure word comprehension in toddlers from diverse linguistic and social backgrounds (e.g., [@friend2003infant,@friend2008reliability,@friend2012evaluating,@poulin2013lexical,@hendrickson2015looking,@deanda2016minimal,@legacy2016vocabulary]. In the CCT, the child views two images on a large touch screen, and the experimenter verbally prompts the child to touch one of them. Nouns, adjectives, and verbs are presented at an appropriate pace for the child, until he/she seems no longer interested in the task. Although all stimuli  were selected from the CDI checklist, a third of the words within each lexical category are words that are typically produced by most toddlers; another third are produced by about half of the toddlers; and the final third is more rare for this age. Given the structure of the task, the authors can extract a number of dependent measures: The number of trials the child has completed, the number for which the child actually attempted a response, the proportion of responses that were correct, and the response times. Over several studies, the CCT creators have documented  results from all these dependent measures among English-, Spanish-, and French-learners, as well as bilinguals, typically tested at between 15 and 21 months. Friend and colleagues' results suggest that, as in the looking-while-listenting task,  individual variation in the  CCT is meaningful. First, older children complete and attempt more trials, have higher accuracy scores, and lower response times than their younger peers in the CCT [@friend2008reliability], suggesting that the task is sensitive to age-related improvements in word comprehension. Second, some differences have been documented as a function of linguistic exposure, such that children with comparably more exposure to a given language will tend to have higher scores than children with less exposure to that language (e.g., [@poulin2013lexical,@deanda2016minimal]). Third, in some cases, but not all, infant performance correlated with maternal education [@deanda2016minimal], a topic we will return to in a moment. Forth, [@friend2012evaluating] found, in a longitudinal study, that the CCT data was more predictive than CDI of later expressive vocabulary measured through parental report as well as via a spontaneous speech sample. As for potential limitations, the CCT, like the Peabody, relies on an overt behavioral response triggered by the experimenter in the framework of a question-answer game-like activity. Thus, it could be subject to similar cultural biases, as children from different cultural and social groups may not be not equally used to this situation.
+
+ 
+In our opinion, two design features make the CCT preferable over both the PPVT and the looking-while-listening task. First, the level of difficulty is randomized across pairs rather than presented in increasing order of difficulty. Since 'easy' and 'difficult' items are mixed together, the task allows a separation of accuracy from number of trials completed/attempted, thus leveling the ground for children varying in executive functions. Second, whereas the PPVT is administered on paper, the touch screen actually produces a contingent response on the screen that could be reinforcing in itself, and thus increase the relevance of the task for the child. [@frank2016using] directly compared word comprehension in 1- to 5-year-olds measured with these three instruments. The authors concluded that a tablet-based task may be preferable over both the looking-while-listening and a paper-based PPVT-like task due to a combination of robust psychometric properties and attractiveness to the child. Similarly, [@friend2008reliability] found the task had good test-retest reliability (r=.7) and convergent validity with the CDI (r=.64). In contrast, [@hendrickson2015looking] found, that whereas the visual response time measures that are drawn on the looking-while-listening ido not correlate significantly with CDI scores at 18 months, the haptic performance measures derived from the CCT did. 
+
+A thorough reading of the studies using CCT reveals only two instances in which SES was discussed. [@friend2012evaluating] found that  children of college-educated mothers had higher scores than children whose mothers had not completed college in a sample of 24 English-learning children with relatively high levels of maternal education. [@deanda2016minimal] gathered CCT and CDI data from 72 American 15- to 18-month-olds exposed mostly to English, varying in SES as well as in degrees of exposure to other languages (completely monolingual versus hearing 5 to 15% other languages). Controlling for the latter, SES explained a significant proportion of variance in CCT accuracy, whereas this relationship was only marginally significant for the CDI scores. In a second experiment, the authors compared a group of children learning only Mexican Spanish against another group exposed to English marginally, with SES also varying. In this second sample, there was no effect of SES on CCT performance. The authors interpret this as a true null result, and cite two sources of convergent evidence gathered from Mexican Spanish-learning toddlers, namely the afore-cited study by Hurtado et al. [@hurtado2008does] and a study with a Mexican Spanish adaptation of the CDI [@jackson1993early]. The authors argue that this differential degree of statistical association between SES and toddler lexical development in American English-speaking and Mexican Spanish-speaking population is due to divergent rearing practices, citing work suggesting that the latter 'encourage obedience and collaboration more so than verbal communication and independence' (p. 175). 
+
+
+##Goals of the current meta-analysis
+
+
+
+
+
+
+
+
+Method 
+
+Search procedures and selection of studies
+Studies were identified through searches of the "Pubmed" engine throughout  September 2016
+ using as keywords "Socio-economic-status" "language" filter from birth to 23 months, and exclusively using the same words but filtering only for preschool.
+This search was on purpose not focusing specifically in vocabulary but in language in general, by this mean a big database was created with 
+ The search required that at least it was mentioned in the abstract studies evaluating language in the appropriate age range.
+ Identified studies required
+
+1.1 Literature search
+
+1.2 Inclusion criteria
+
+1.3 Eligible word comprehension and SES measures
+
+1.4 selection of studies
+
+2. Effect size and moderator coding procedure
+
+2.1 Effect size coding
+
+2.2 Moderator Coding 
+
+Sample characteristics
+
+Age range
+Intended sampleSES
+Amount of SES variability in the sample
+Extent of exclusionary criteria
+Racial/ethnic composition
+Mean age
+Sex composition
+
+Effect size characteirstics
+
+Category of SES construct
+Number of measures used to calculate the SES variable
+Category of Word comprehension construct
+Number of measures used to calculate the word comprehension variable
+
+Publication characteristics
+
+Type of publication
+SES as a primary focus
+
+3.  Analytical procedures
+
+3.1 Calculating average effect size
+3.2 statistical independence
+3.3 Fixed and random effect models
+3.4 Test for heterogeneity
+3.5 Moderator Analysis
+type of SES measure
+type of vocabulary measure
+type of test (indirect/direct)
+Age
+type of location 
+
+3.5 Test for publication bias
+
+
+RESULTS
+
+Study characteristics
+Overall effect size
+Tests for heterogeneity 
+
+4. Moderator analysis
+4.1 Sample chracteristics
+4.2 Effect size charateristics
+4.3 Publication characteristics
+4.4 publication bias
+
+Discussion
+
+
+
+
+
+
+Eligibility Criteria for Study Inclusion
+Typing "language" & SES in pubmed search
+
+
+ We excluded studies that reported vocabulary outcomes and socioeconomic status differences. 
+ as well as studies that only reported outcomes in language or executive function. If two or more studies referred to the same population, the study that had evaluated the effect of SES on cognitive outcome as a stated objective was included in the review. If two or more, or none, of the studies referring to the same population had that objective, the most recently published article that reported the cognitive outcome of the partici- pants at an older age was selected.
+
+Data Sources and Search Strategy
+
+We searched electronic databases MEDLINE, EMBASE, PsycINFO and Social Science Citation Index using the following search terms, both as keywords and as subject headings: ((‘‘preterm’’ or ‘‘premature’’) and (‘‘birth’’ or ‘‘delivery’’ or ‘‘infant’’)) or (‘‘prematurity’’ or ‘‘low birth weight’’) and (‘‘social’’ or ‘‘socioeconomic’’ or ‘‘sociode- mographic’’ or ‘‘environment*’’) and (‘‘intelligence’’ or ‘‘IQ’’ or ‘‘cogniti*’’ or ‘‘academic’’ or ‘‘development’’). The ‘‘explode’’ feature was used with subject headings to include articles categorized under more specific subhead- ings. The search was restricted to English-language articles published between January 1990 and July 2011, in order to avoid study populations born before 1990. The title and abstract of all studies retrieved from the electronic search were screened to identify case–control or cohort studies that reported cognitive outcomes among children born preterm, VLBW or ELBW. The full text of all relevant studies identified from the initial screen were then evaluated to select articles that reported the effect of at least one SES indicator on cognitive outcome. The elec- tronic search was supplemented by a manual search of the reference lists of studies that met the eligibility criteria for inclusion. 
+
+Study Quality Assessment
+We assessed the quality of included studies based on their design, representativeness of the study population, quality of the SES data, quality of the outcome data and appro- priateness of statistical analyses, using an appraisal checklist adapted from the Quality Assessment Tool for Quantitative Studies of the Effective Public Health Practice Project [20] (Table 1). The aim of the appraisal is to pro- vide a descriptive score of the external validity of the effect of SES reported by the studies. Each study was given a component rating of ‘‘strong’’, ‘‘moderate’’ or ‘‘weak’’ in each of the five areas assessed. A global quality rating was then assigned to the studies based on the component rat- ings. Studies that did not receive any ‘‘weak’’ component rating were judged ‘‘strong’’ globally. Studies that received one ‘‘weak’’ component rating were assigned a global rating of ‘‘moderate’’ and studies were considered ‘‘weak’’ globally if they received two or more ‘‘weak’’ component ratings. No study was excluded from the review on the basis of its quality
+
+ Data Extraction
+
+From each included study, we extracted data on: (1) study characteristics, such as population, setting and sampling methods; (2) cognitive measures including participants’ ages at cognitive assessment and type of assessment tools employed; (3) types of SES indicators used and the defi- nitions for categorization; and (4) statistical tests used and the direction, magnitude and statistical significance of the effect of each SES indicator on cognitive outcome. The variables included as confounders in multivariable analyses were also recorded. If the article reported results from repeated cognitive assessment at different time points, the data obtained from participants at the older age were extracted. No attempt was made to contact authors for additional data missing from the published article.
+
+Data Synthesis
+
+SES indicators were classified into four categories: indi- vidual-level, family-structure, contextual and composite indicators. The number of studies that evaluated each SES indicator and the proportion of studies that reported a sta- tistically significant effect of the SES indicator on cogni- tive outcome were calculated. The range of the magnitude of effect of SES indicators on cognitive outcomes reported by the studies was recorded, focusing on results that had been appropriately adjusted for confounders. The 5 %level was used to define statistical significance
+
+
+Flowchart
+The literature search yielded 4,162 unique articles with 19 studies meeting the eligibility criteria. Seven studies were based on the same three populations. As none of these studies had specifically aimed to evaluate the effect of SES on cognitive outcome, the most recently published article was selected, resulting in 15 studies [21–35] included in the review (Fig. 1). All included studies had adopted a longi- tudinal cohort design. No additional study was identified from the manual search. The characteristics of the studies are summarized in
+Table 2. Thirteen studies reported the effect of SES on cognitive outcome assessed at a single point in time [21–33]. Of these, five had conducted the assessment before the age of 2 years [26, 28, 29, 32, 33], four at pre- school-age (ages 3–4 years) [23–25, 30] and four at school- age (age older than 5 years) [21, 22, 27, 31]. Three studies reported the effect of SES on the change in cognitive status over time [32, 34, 35]. Depending Depending on the cognitive assessment employed, cognitive scores were expressed as developmental quo- tients, Mental Development Index (MDI) from the Bayley Scales of Development, Mental Processing Composite from the Kaufman Assessment Battery for Children, reading and mathematics scores from the Wechsler Indi- vidual Achievement Test-II and IQ. Overall, the quality of the data on SES was high (Table 3). Three studies [22, 25, 30] received ‘‘weak’ Matern Child Health J (2013) 17:1689–1700
+component ratings for their analyses as they did not ade- quately adjust for confounders and had reported the effect of SES on cognitive outcome using bivariate analyses.
+Types of SES Indicator
+Thirteen indicators of SES were evaluated by the included studies (Table 4). Maternal educational level was the most frequently used SES indicator. Maternal age at birth and race/ethnicity were used as proxy indicators of SES. The use of medical insurance status as a SES indicator was unique to studies based in the USA. The composite indi- cator of ‘‘social risk’’ comprised several individual-level indicators. Piecuch et al. [30] defined high ‘‘social risk’’ as one or more of maternal education under 12 years, com- plete unemployment in a household and dependence on government assistance for health insurance. Hack et al. [26] derived an ordinal ‘‘social risk’’ score based on maternal marital status, race and educational level. In a separate study, Hack et al. [34] derived a composite indi- cator of SES using the mean of z scores of maternal edu- cation and neighbourhood median family income. Both contextual indicators listed in Table 4 were used in the study by Hack et al. [34] to describe the effect of SES on the the change in cognitive status over time.
+
+Nous avons effectué une méta-analyse sur un corpus de 12 articles portant sur l’impact du niveau socio-économique des parents sur le vocabulaire de leur enfant. Pour sélectionner ces articles nous avons choisi des critères en rapport avec notre étude expérimentale précédente. Nous nous sommes concentrés sur les mêmes types de tests que nous avons réalisé, c’est à dire le CDI (IFDC en français), le CCT mais aussi le Peabody Picture Vocabulary Test (PPVT) car c’est une version non numérique du CCT où l’enfant doit montrer parmi 2 ou 4 images celle nommée par l’expérimentateur (Rice & Watkins, 1996). Nous avons donc étudié la compréhension (CCT, PPVT, CDI) et la production (CDI) du vocabulaire des enfants. Les enfants devaient aussi être âgés de moins de 42 mois. J’ai sélectionné ce sous-ensemble d‘articles d’une plus grande sélection réalisée par l’équipe. Cette grande sélection résulte d’une recherche sur pubmed avec des critères plus larges : rassembler tous les articles qui traitent de l’influence du niveau socio-économique sur le langage de l’enfant de moins de 6 ans. Du fait de mes critères précis cités plus haut, je n’ai pas pu inclure un grand nombre d’articles, c’est pourquoi ma méta-analyse porte sur 12 articles au total.
+L’objectif est d'estimer la taille d’effet, une mesure qui indique la force de la relation entre deux variables. Ici nous cherchons à observer la force de la relation entre le milieu socio-économique et le vocabulaire de l’enfant. Pour intégrer les résultats dans une analyse quantitative, il est nécessaire d’avoir des échantillons mutuellement indépendants et non liés. Si ces échantillons sont liés, c’est-à-dire si plusieurs mesures sont effectuées sur les mêmes enfants à l’intérieur d’un papier,  nous les fusionnons en prenant la moyenne. Par exemple, si à l’intérieur d’un papier, les mêmes enfants sont testés avec plusieurs tests de compréhension (CDI Compréhension + CCT), alors ces échantillons sont considérés comme liés, et donc leurs corrélations sont fusionnées. Pour les données où nous n’avons pas une corrélation mais plutôt un contraste entre deux groupes, nous utilisons les différences de moyenne standardisée d, puis appliquons une formule de conversion d → r. Pour déterminer la précision de chaque taille d’effet, nous calculons l’erreur type qui prend en compte le nombre d’enfants testés. Plus ce nombre d’enfants testés est grand, plus l’étude est précise, et donc plus elle a du poids dans l’analyse globale. Afin que les corrélations soient comparables, nous utilisons la transformation de Fisher pour les convertir en z.
+
+Results
+Les analyses ont été réalisées principalement sur excel, puis vérifiés avec des packages R (metafor, Viechtbauer 2010). Pour pouvoir analyser toutes les données de la littérature et pouvoir les comparer entre elles, nous réalisons un graphique en entonnoir, qui montre la taille d’effet en fonction de la précision de l’étude. Plus le nombre de sujet d’une étude est grand, plus l’étude est considérée comme précise et donc plus elle se rapproche de la valeur moyenne de l’ensemble des études, ce qui représente notre meilleure estimation de la vraie valeur d’association. Ces études où la précision est importante se trouvent donc en haut du graphique, proche de la moyenne puisque l’intervalle de confiance, et donc les fluctuations d’échantillonnage sont moins importants. Cependant, nous remarquons que les données les plus précises ne sont pas toujours celles qui se rapprochent de la moyenne et donc de la vraie valeur. Nous observons que l’étude la plus précise des données étudiant la compréhension (figure 7) correspond à celle où les enfants sont les plus jeunes (figure 8). C’est donc peut être dû au fait que les enfants sont très jeunes comparés aux autres enfants, que cette taille de l’effet s’éloigne de la valeur moyenne.
+Un graphique en entonnoir permet aussi de visualiser s’il existe des biais de publication. Pour qu’il n’y ait pas de biais de publication, il faut que le nuage de points représente un entonnoir symétrique (représenté par le triangle blanc), avec autant d’études de part et d’autres de la valeur moyenne. Notre graphique nous montre qu’il n’y a pas de biais de publication (test for funnel plot asymmetry: z = 1,0926, p = 0,2746).
+
+Figure 7 : Graphique en entonnoir montrant la taille d’effet (z) des études en fonction de leur précision (Erreur type de la taille d’effet).
+Les études étudiant la production des enfants (tests : CDI production) sont représentées par les cercles rouge. Les études étudiant la compréhension des enfants (tests : CCT, PPVT, CDI compréhension) sont représentées par les cercles blanc. Les deux cercles avec des croix représentent nos études en crèches. Celui en rouge correspond à notre test du CDI pour les données de production, et celui en blanc correspond à notre test sur tablette tactile (CCT) étudiant la compréhension de l’enfant.
+
+
+Une méta-régression révèle que la taille d’effet, quand toutes les données sont prises en compte est de 0,25. Lors de notre première étude (tests expérimentaux), nous avons observé un effet plus fort pour le CDI production (r = 0,493) que pour le test de compréhension sur tablette (r = 0,337), ce qui va dans le même sens que les résultats de Vogt et ses collaborateurs (2015), qui observent de plus grands effets du niveau d’études de la mère sur la production que sur la compréhension au Mozambique. Nous avons donc vérifié si le mode de test avait un impact sur le coefficient d’association. Une méta-régression ajustée sur les 13 données de compréhension des enfants est de 0,29, alors que celles pour les 9 données de production est de 0,19. Contrairement à notre étude et celle de Vogt, les tailles d’effet pour les études étudiant la compréhension de l’enfant sont généralement plus grandes que celles étudiant la production (figure 7), mais cette différence n’est pas significative. 
+
+Figure 8 : Taille de l’effet en fonction de l’âge de l’enfant et du type de test
+
+Nous avons ensuite observé si la taille d’effet était influencée par l’âge. D’après la figure 8, nous pouvons voir que la taille d’effet augmente avec l’âge pour les résultats des mesures de compréhension de l’enfant, mais cela n’est pas le cas pour les résultats de production, pour lesquels la taille d’effet ne change pas avec l’âge. Une méta-régression déclarant le type de mesure (production, compréhension), l’âge, ainsi que leur intéraction, ne révèle néanmoins pas une intéraction significative, mais seulement un effet principal de l’âge.
+Discussion
+
+References
