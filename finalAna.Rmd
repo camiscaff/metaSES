@@ -25,7 +25,7 @@ write.table(comp,"comp.txt",row.names=F,sep="\t")
 comp <- read.table("comp.txt",sep="\t",header=T,  dec = ",")
 comp$type="comp"
 all=comp
-names(all)<-c("id","age","z","n","r", "loc", "lang_measure", "lang_cat", "SES_measure", "SES_cat", "SES_priority", "type_of_measure","type")
+names(all)<-c("id","group","age","z","n","r", "loc", "lang_measure", "lang_cat", "SES_measure", "SES_cat", "SES_priority", "type_of_measure","type")
 
 all$locgen=ifelse(all$loc=="United States","US","other")
 
@@ -47,13 +47,20 @@ rma.all
 
 forest(rma.all)
 regtest(rma.all)
-
-pdf("~/Desktop/funnel.pdf",height=5,width=5)
 funnel(rma.all)
-points(all$se~all$z,pch=20,col="white")
-# points(all$se~all$z,subset=c(all$type=="prod"),pch=20,col="red")
-# points(all$se~all$z,subset=c(all$id=="notre_CCT"),pch=3,cex=2)
-# points(all$se~all$z,subset=c(all$id=="notre_CDI_production"),pch=3,cex=2)
+points(all$se~all$z,subset=c(all$lang_cat=="PPVT"),pch=20,col="red")
+points(all$se~all$z,subset=c(all$lang_cat=="CDI"),pch=20,col="black")
+points(all$se~all$z,subset=c(all$lang_cat=="CCT"),pch=20,col="white")
+plot(all$z~ all$age,cex=1+(all$n/max(all$n,na.rm=T)),col=ifelse(all$lang_cat=="PPVT","red","black"),xlab="Age (days)",ylab="z",pch=20)
+lines(c(0,1500),c(0,0),lty=2)
+
+pdf("~/Desktop/forest.pdf",height=5,width=9)
+forest(rma.all)
+#points(all$se~all$z,subset=c(all$lang_cat=="PPVT"),pch=20,col="red")
+#points(all$se~all$z,subset=c(all$lang_cat=="CDI"),pch=20,col="black")
+#points(all$se~all$z,subset=c(all$lang_cat=="CCT"),pch=20,col="white")
+plot(all$z~ all$age,cex=1+(all$n/max(all$n,na.rm=T)),col="black",xlab="Age (days)",ylab="z",pch=20)
+lines(c(0,1500),c(0,0),lty=2)
 
 ```
 ### all moderators
